@@ -1,19 +1,19 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"flag"
+	"fmt"
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"log"
 	"os"
 	"os/exec"
-	"flag"
-	"log"
-	"fmt"
 	"strings"
-	"context"
 	"time"
-	"encoding/json"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var version string = "unknown"
@@ -65,7 +65,7 @@ func dumpServices() error {
 	if err != nil {
 		return err
 	}
-	
+
 	api := clientset.Core()
 	svcs, err := api.Services("").List(meta.ListOptions{})
 	if err != nil {
@@ -103,16 +103,16 @@ func watchServices(script string) error {
 	for {
 
 		// Wait for any update
-		<- ch
+		<-ch
 
 		// There will be an item in the channel for *every* service that
 		// is updated. Especially on start-up there will be a storm of
 		// events but we really want to update just once. So wait a short
 		// time for more events and then drain the channel.
-		time.Sleep(100*time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 		for drained := false; drained == false; {
 			select {
-			case <- ch:
+			case <-ch:
 			default:
 				drained = true
 			}
