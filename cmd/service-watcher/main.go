@@ -16,11 +16,19 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var version string = "unknown"
+
 func main() {
 	dumpSvc := flag.Bool("services", false, "Dump all services in json format")
 	watchSvc := flag.Bool("watch", false, "Watch all services")
 	script := flag.String("script", "", "Script called on a sevice update")
+	ver := flag.Bool("version", false, "Print version and quit")
 	flag.Parse()
+
+	if *ver {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	if *dumpSvc {
 		if err := dumpServices(); err != nil {
