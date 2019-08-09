@@ -23,12 +23,11 @@ process the output with [jq](https://stedolan.github.io/jq/).
 ## Build
 
 ```
-go get k8s.io/client-go
-go get k8s.io/apimachinery
+go get k8s.io/client-go/...
+go get k8s.io/apimachinery/...
 go get github.com/Nordix/service-watcher
-ver=$(date +%F:%T)
 CGO_ENABLED=0 GOOS=linux go install -a \
-  -ldflags "-extldflags '-static' -X main.version=$ver" \
+  -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" \
   github.com/Nordix/service-watcher/cmd/service-watcher
 strip $GOPATH/bin/service-watcher
 ```
