@@ -95,7 +95,7 @@ func watchServices(script string) error {
 	if err != nil {
 		return err
 	}
-	api := clientset.Core()
+	api := clientset.CoreV1()
 
 	watcher, err := api.Services("").Watch(meta.ListOptions{})
 	if err != nil {
@@ -147,7 +147,7 @@ func watchNodes(script string) error {
 	if err != nil {
 		return err
 	}
-	api := clientset.Core()
+	api := clientset.CoreV1()
 
 	watcher, err := api.Nodes().Watch(meta.ListOptions{})
 	if err != nil {
