@@ -1,7 +1,6 @@
 # service-watcher
 
-Minimal Kubernetes service watcher intended for scripts. You *can* use
-`kubectl` for this but you probably don't want it in a pod.
+Minimal Kubernetes service watcher intended for scripts.
 
 Test using default `$HOME/.kube/`;
 ```
@@ -22,11 +21,8 @@ process the output with [jq](https://stedolan.github.io/jq/).
 
 ## Build
 
-(go-modules assumed)
 ```
-go get github.com/Nordix/service-watcher
-CGO_ENABLED=0 GOOS=linux go install -a \
-  -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" \
-  github.com/Nordix/service-watcher/cmd/service-watcher
-strip $GOPATH/bin/service-watcher
+CGO_ENABLED=0 GOOS=linux go build -o service-watcher \
+  -ldflags "-extldflags '-static' -X main.version=$(date +%F:%T)" ./cmd/service-watcher
+strip service-watcher
 ```

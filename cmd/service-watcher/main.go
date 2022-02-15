@@ -75,7 +75,7 @@ func dumpServices() error {
 	}
 
 	api := clientset.CoreV1()
-	svcs, err := api.Services("").List(meta.ListOptions{})
+	svcs, err := api.Services("").List(context.TODO(), meta.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func watchServices(script string) error {
 	}
 	api := clientset.CoreV1()
 
-	watcher, err := api.Services("").Watch(meta.ListOptions{})
+	watcher, err := api.Services("").Watch(context.TODO(), meta.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func watchNodes(script string) error {
 	}
 	api := clientset.CoreV1()
 
-	watcher, err := api.Nodes().Watch(meta.ListOptions{})
+	watcher, err := api.Nodes().Watch(context.TODO(), meta.ListOptions{})
 	if err != nil {
 		return err
 	}
