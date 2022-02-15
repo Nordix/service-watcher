@@ -18,6 +18,12 @@ service-watcher -watch -script /path/to/myscript
 In the script dump all services with `service-watcher -services` and
 process the output with [jq](https://stedolan.github.io/jq/).
 
+Services can be selected by the `service.kubernetes.io/service-proxy-name`;
+```
+service-watcher -services -label my-proxy-implementation | jq
+```
+
+
 
 ## Build
 

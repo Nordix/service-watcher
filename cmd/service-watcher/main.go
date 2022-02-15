@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var version string = "unknown"
@@ -24,6 +25,7 @@ func main() {
 	watchSvc := flag.Bool("watch", false, "Watch all services")
 	watchNodesFlag := flag.Bool("watch-nodes", false, "Watch nodes")
 	script := flag.String("script", "", "Script called on api update")
+	label := flag.String("label", "", "service-proxy-name")
 	ver := flag.Bool("version", false, "Print version and quit")
 	flag.Parse()
 
@@ -33,13 +35,13 @@ func main() {
 	}
 
 	if *dumpSvc {
-		if err := dumpServices(); err != nil {
+		if err := dumpServices(*label); err != nil {
 			log.Fatal(err)
 		}
 		os.Exit(0)
 	}
 	if *watchSvc {
-		if err := watchServices(*script); err != nil {
+		if err := watchServices(*script, *label); err != nil {
 			log.Fatal(err)
 		}
 		os.Exit(0)
@@ -68,14 +70,18 @@ func getClientset() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func dumpServices() error {
+func dumpServices(label string) error {
 	clientset, err := getClientset()
 	if err != nil {
 		return err
 	}
 
 	api := clientset.CoreV1()
-	svcs, err := api.Services("").List(context.TODO(), meta.ListOptions{})
+	options := meta.ListOptions{}
+	if label != "" {
+		options.LabelSelector = "service.kubernetes.io/service-proxy-name=" + label
+	}
+	svcs, err := api.Services("").List(context.TODO(), options)
 	if err != nil {
 		return err
 	}
@@ -90,14 +96,17 @@ func dumpServices() error {
 	return nil
 }
 
-func watchServices(script string) error {
+func watchServices(script string, label string) error {
 	clientset, err := getClientset()
 	if err != nil {
 		return err
 	}
 	api := clientset.CoreV1()
-
-	watcher, err := api.Services("").Watch(context.TODO(), meta.ListOptions{})
+	options := meta.ListOptions{}
+	if label != "" {
+		options.LabelSelector = "service.kubernetes.io/service-proxy-name=" + label
+	}
+	watcher, err := api.Services("").Watch(context.TODO(), options)
 	if err != nil {
 		return err
 	}
